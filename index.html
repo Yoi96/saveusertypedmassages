@@ -32,7 +32,7 @@
             submittedMessagesList.innerHTML = ''; // Clear current list
             submittedMessages.forEach((message, index) => {
                 const li = document.createElement('li');
-                li.textContent = message;
+                li.textContent = `${index + 1}: ${message}`; // Add index number before the message
 
                 // Create a remove button
                 const removeButton = document.createElement('button');
