@@ -18,82 +18,93 @@
     <ul id="submittedMessagesList"></ul>
 
     <script>
-       const userMessageInput = document.getElementById('userMessage');
-const displayMessageDiv = document.getElementById('displayMessage');
-const submitButton = document.getElementById('submitButton');
-const saveButton = document.getElementById('saveButton');
-const submittedMessagesList = document.getElementById('submittedMessagesList');
+        const userMessageInput = document.getElementById('userMessage');
+        const displayMessageDiv = document.getElementById('displayMessage');
+        const submitButton = document.getElementById('submitButton');
+        const saveButton = document.getElementById('saveButton');
+        const submittedMessagesList = document.getElementById('submittedMessagesList');
 
-// Load submitted messages from localStorage
-let submittedMessages = JSON.parse(localStorage.getItem('submittedMessages')) || [];
+        // Load submitted messages from localStorage
+        let submittedMessages = JSON.parse(localStorage.getItem('submittedMessages')) || [];
 
-// Function to render messages
-function renderMessages() {
-    submittedMessagesList.innerHTML = ''; // Clear current list
-    submittedMessages.forEach(message => {
-        const li = document.createElement('li');
-        li.textContent = message;
-        submittedMessagesList.appendChild(li);
-    });
-}
+        // Function to render messages
+        function renderMessages() {
+            submittedMessagesList.innerHTML = ''; // Clear current list
+            submittedMessages.forEach((message, index) => {
+                const li = document.createElement('li');
+                li.textContent = message;
 
-// Initial render of messages
-renderMessages();
+                // Create a remove button
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.onclick = () => removeMessage(index);
 
-// Update displayed message as the user types
-userMessageInput.addEventListener('input', function() {
-    displayMessageDiv.textContent = userMessageInput.value;
-});
+                li.appendChild(removeButton);
+                submittedMessagesList.appendChild(li);
+            });
+        }
 
-// Submit message functionality
-submitButton.addEventListener('click', function() {
-    const message = userMessageInput.value.trim();
+        // Initial render of messages
+        renderMessages();
 
-    if (message === '') {
-        alert('Please enter a message to submit.');
-        return;
-    }
+        // Update displayed message as the user types
+        userMessageInput.addEventListener('input', function() {
+            displayMessageDiv.textContent = userMessageInput.value;
+        });
 
-    // Add message to the array
-    submittedMessages.push(message);
-    localStorage.setItem('submittedMessages', JSON.stringify(submittedMessages)); // Save to localStorage
+        // Submit message functionality
+        submitButton.addEventListener('click', function() {
+            const message = userMessageInput.value.trim();
 
-    // Create a list item for the submitted message
-    const li = document.createElement('li');
-    li.textContent = message;
-    submittedMessagesList.appendChild(li);
-    
-    // Clear the textarea and display area after submitting
-    userMessageInput.value = '';
-    displayMessageDiv.textContent = '';
-});
+            if (message === '') {
+                alert('Please enter a message to submit.');
+                return;
+            }
 
-// Save submitted messages as a text file
-saveButton.addEventListener('click', function() {
-    if (submittedMessages.length === 0) {
-        alert('No messages to save.');
-        return;
-    }
+            // Add message to the array
+            submittedMessages.push(message);
+            localStorage.setItem('submittedMessages', JSON.stringify(submittedMessages)); // Save to localStorage
 
-    // Join submitted messages into a single string with line breaks
-    const messagesToSave = submittedMessages.join('\n');
+            // Clear the textarea and display area after submitting
+            userMessageInput.value = '';
+            displayMessageDiv.textContent = '';
 
-    // Create a Blob from the messages
-    const blob = new Blob([messagesToSave], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
+            // Re-render messages
+            renderMessages();
+        });
 
-    // Create a link element and trigger a download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'submitted_messages.txt'; // Name of the downloaded file
-    document.body.appendChild(a);
-    a.click();
+        // Function to remove a message
+        function removeMessage(index) {
+            submittedMessages.splice(index, 1); // Remove the message from the array
+            localStorage.setItem('submittedMessages', JSON.stringify(submittedMessages)); // Update localStorage
+            renderMessages(); // Re-render messages
+        }
 
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
+        // Save submitted messages as a text file
+        saveButton.addEventListener('click', function() {
+            if (submittedMessages.length === 0) {
+                alert('No messages to save.');
+                return;
+            }
 
+            // Join submitted messages into a single string with line breaks
+            const messagesToSave = submittedMessages.join('\n');
+
+            // Create a Blob from the messages
+            const blob = new Blob([messagesToSave], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            // Create a link element and trigger a download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'submitted_messages.txt'; // Name of the downloaded file
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
     </script>
 </body>
 </html>
